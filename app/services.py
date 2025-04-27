@@ -22,14 +22,23 @@ async def generate_report():
     # Load input and reference data
     input_df = pd.read_csv("uploads/input.csv")
     reference_df = pd.read_csv("uploads/reference.csv")
+    
+    # Merge input and reference data on keys
+    merged_df = input_df.merge(reference_df, on=['refkey1', 'refkey2'], how='left')
 
-    # Perform transformations based on rules
+    # Create an empty DataFrame for output
     output_df = pd.DataFrame()
-    output_df['outfield1'] = input_df['field1'] + input_df['field2']
-    output_df['outfield2'] = reference_df['refdata1']
-    output_df['outfield3'] = reference_df['refdata2'] + reference_df['refdata3']
-    output_df['outfield4'] = input_df['field3'].astype(float) * input_df[['field5', 'refdata4']].max(axis=1)
-    output_df['outfield5'] = input_df[['field5', 'refdata4']].max(axis=1)
+
+# Apply transformations based on rules
+    for rule in rules:
+        if rule["operation"] == "concat":
+            output_df[rule["output_field"]] = merged_df[rule["inputs"][0]] + merged_df[rule["inputs"][1]]
+        elif rule["operation"] == "reference":
+            output_df[rule["output_field"]] = merged_df[rule["reference_field"]]
+        elif rule["operation"] == "multiply_max":
+            output_df[rule["output_field"]] = merged_df[rule["inputs"][0]].astype(float) * merged_df[[rule["inputs"][1], rule["reference_field"]]].max(axis=1)
+        elif rule["operation"] == "max":
+            output_df[rule["output_field"]] = merged_df[[rule["inputs"][0], rule["reference_field"]]].max(axis=1)
 
     report_path = "uploads/output.csv"
     output_df.to_csv(report_path, index=False)
