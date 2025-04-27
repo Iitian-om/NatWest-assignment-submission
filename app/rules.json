@@ -1,0 +1,31 @@
+{
+    "transformations": [
+        {
+            "output_field": "outfield1",
+            "operation": "concat",
+            "inputs": ["field1", "field2"]
+        },
+        {
+            "output_field": "outfield2",
+            "operation": "reference",
+            "reference_field": "refdata1"
+        },
+        {
+            "output_field": "outfield3",
+            "operation": "concat",
+            "inputs": ["refdata2", "refdata3"]
+        },
+        {
+            "output_field": "outfield4",
+            "operation": "multiply_max",
+            "inputs": ["field3", "field5"],
+            "reference_field": "refdata4"
+        },
+        {
+            "output_field": "outfield5",
+            "operation": "max",
+            "inputs": ["field5"],
+            "reference_field": "refdata4"
+        }
+    ]
+}
